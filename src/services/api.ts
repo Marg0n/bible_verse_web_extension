@@ -1,4 +1,4 @@
-﻿import type { Verse } from '../types'
+import type { Verse } from '../types'
 
 const MOCK_VERSES: Verse[] = [
     {
@@ -29,8 +29,17 @@ const MOCK_VERSES: Verse[] = [
 ]
 
 export function getDailyVerse(): Verse {
-    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000)
-    return MOCK_VERSES[dayOfYear % MOCK_VERSES.length]
+    const today = new Date();
+    const dateString = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+    
+    // Simple hash function for the date string
+    let hash = 0;
+    for (let i = 0; i < dateString.length; i++) {
+        hash = (hash << 5) - hash + dateString.charCodeAt(i);
+        hash |= 0; // Convert to 32bit integer
+    }
+    
+    return MOCK_VERSES[Math.abs(hash) % MOCK_VERSES.length];
 }
 
 export function getRandomVerse(): Verse {
