@@ -2,7 +2,7 @@ import { useState } from 'react';
 import PopupLayout from '../components/layout/PopupLayout';
 import Button from '../components/ui/Button';
 import VerseCard from '../components/features/VerseCard';
-import Input from '../components/ui/Input';
+
 import StreakBadge from '../components/features/StreakBadge';
 import FavoriteButton from '../components/features/FavoriteButton';
 import ShareMenu from '../components/features/ShareMenu';
@@ -14,7 +14,7 @@ export default function Popup() {
     const [verse, setVerse] = useState<Verse>(getDailyVerse());
     const [loading, setLoading] = useState(false);
     const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
+
     
     const { favorites } = useFavorites();
 
@@ -53,16 +53,8 @@ export default function Popup() {
             }
         >
             <div className="flex flex-col gap-3">
-                {/* Search & Date Compact Layout */}
-                <div className="flex items-center justify-between gap-4 px-1">
-                    <div className="flex-1 max-w-[140px]">
-                        <Input 
-                            placeholder="Quick search..." 
-                            value={searchQuery}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                            className="h-8 text-[11px] border-zinc-800/50 focus:bg-zinc-900/50"
-                        />
-                    </div>
+                {/* Date Display */}
+                <div className="flex items-center justify-end px-1">
                     <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest opacity-80 whitespace-nowrap">
                         {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </p>
