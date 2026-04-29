@@ -28,7 +28,7 @@ export default function Popup() {
 
     return (
         <PopupLayout 
-            title="Daily Bible Verse"
+            title="Bible Verse"
             headerAction={
                 <div className="flex items-center gap-3">
                     <StreakBadge />
