@@ -1,21 +1,29 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PopupLayout from '../components/layout/PopupLayout';
 import Button from '../components/ui/Button';
 import VerseCard from '../components/features/VerseCard';
-
+import Input from '../components/ui/Input';
 import StreakBadge from '../components/features/StreakBadge';
 import FavoriteButton from '../components/features/FavoriteButton';
 import ShareMenu from '../components/features/ShareMenu';
 import { useFavorites } from '../hooks/useFavorites';
-import { getDailyVerse, getRandomVerse } from '../services/api';
+import { getDailyVerse, getRandomVerse, searchVerses } from '../services/api';
 import type { Verse } from '../types';
 
 export default function Popup() {
     const [verse, setVerse] = useState<Verse>(getDailyVerse());
     const [loading, setLoading] = useState(false);
     const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<Verse[]>([]);
 
-    
+    useEffect(() => {
+        if (searchQuery.trim()) {
+            setSearchResults(searchVerses(searchQuery));
+        } else {
+            setSearchResults([]);
+        }
+    }, [searchQuery]);
     const { favorites } = useFavorites();
 
     const handleNewVerse = (type: 'random' | 'daily') => {
@@ -53,15 +61,54 @@ export default function Popup() {
             }
         >
             <div className="flex flex-col gap-3">
-                {/* Date Display */}
-                <div className="flex items-center justify-end px-1">
+                {/* Search & Date Compact Layout */}
+                <div className="flex items-center justify-between gap-4 px-1">
+                    <div className="flex-1 max-w-[140px] relative">
+                        <Input 
+                            placeholder="Search verses..." 
+                            value={searchQuery}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                            className="h-8 text-[11px] border-zinc-800/50 focus:bg-zinc-900/50"
+                        />
+                    </div>
                     <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest opacity-80 whitespace-nowrap">
                         {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </p>
                 </div>
 
+                {/* Search Results Dropdown */}
+                {searchQuery.trim() !== '' && (
+                    <div className="flex flex-col gap-2 max-h-32 overflow-y-auto px-1">
+                        {searchResults.length === 0 ? (
+                            <p className="text-xs text-zinc-600 font-medium py-1">No verses found.</p>
+                        ) : (
+                            searchResults.map((v) => (
+                                <div 
+                                    key={v.reference}
+                                    onClick={() => {
+                                        setVerse(v);
+                                        setSearchQuery('');
+                                    }}
+                                    className="p-2 rounded-lg bg-zinc-900/30 border border-zinc-800/30 hover:border-zinc-700/50 hover:bg-zinc-900/50 transition-all cursor-pointer group"
+                                >
+                                    <div className="flex items-center justify-between gap-3">
+                                        <p className="text-[11px] font-semibold text-zinc-400 group-hover:text-zinc-200 transition-colors line-clamp-1 flex-1 leading-none">
+                                            {v.verse}
+                                        </p>
+                                        <span className="text-[9px] font-bold text-zinc-600 group-hover:text-zinc-500 uppercase flex-shrink-0 tracking-wider">
+                                            {v.reference}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                )}
+
                 {/* Main Verse Display */}
-                <VerseCard verse={verse} loading={loading} />
+                {searchQuery.trim() === '' && (
+                    <VerseCard verse={verse} loading={loading} />
+                )}
 
                 {/* Favorites Section (Collapsible) */}
                 <div className="pt-2 border-t border-zinc-800/20">

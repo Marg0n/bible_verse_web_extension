@@ -45,3 +45,12 @@ export function getDailyVerse(): Verse {
 export function getRandomVerse(): Verse {
     return MOCK_VERSES[Math.floor(Math.random() * MOCK_VERSES.length)]
 }
+
+export function searchVerses(query: string): Verse[] {
+    const lowerQuery = query.toLowerCase();
+    return MOCK_VERSES.filter((v) => 
+        v.reference.toLowerCase().includes(lowerQuery) || 
+        v.verse.toLowerCase().includes(lowerQuery) ||
+        v.text.toLowerCase().includes(lowerQuery)
+    );
+}
