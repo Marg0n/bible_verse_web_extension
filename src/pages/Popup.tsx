@@ -18,12 +18,13 @@ export default function Popup() {
     const [searchResults, setSearchResults] = useState<Verse[]>([]);
 
     useEffect(() => {
-        if (searchQuery.trim()) {
-            setSearchResults(searchVerses(searchQuery));
+        if (searchQuery) {
+            setSearchResults(searchVerses(searchQuery.trim()));
         } else {
             setSearchResults([]);
         }
     }, [searchQuery]);
+
     const { favorites } = useFavorites();
 
     const handleNewVerse = (type: 'random' | 'daily') => {
