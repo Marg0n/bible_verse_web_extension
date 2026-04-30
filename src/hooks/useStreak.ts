@@ -1,30 +1,36 @@
-import { useState, useEffect } from 'react';
+import { useState } from "react";
 
 export function useStreak() {
-    const [streak, setStreak] = useState(() => {
-        const saved = localStorage.getItem('streak');
-        return saved ? JSON.parse(saved) : { count: 0, lastVisit: '' };
-    });
+  const [streak] = useState(() => {
+    const saved = localStorage.getItem("streak");
+    const prev = saved ? JSON.parse(saved) : { count: 0, lastVisit: "" };
 
-    useEffect(() => {
-        const today = new Date().toDateString();
-        if (streak.lastVisit !== today) {
-            const lastDate = streak.lastVisit ? new Date(streak.lastVisit) : null;
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
+    const today = new Date().toDateString();
 
-            let newCount = streak.count;
-            if (!lastDate || lastDate.toDateString() === yesterday.toDateString()) {
-                newCount += 1;
-            } else if (lastDate.toDateString() !== today) {
-                newCount = 1;
-            }
+    //? If user already visited today => do nothing
+    if (prev.lastVisit === today) {
+      return prev;
+    }
 
-            const newStreak = { count: newCount, lastVisit: today };
-            setStreak(newStreak);
-            localStorage.setItem('streak', JSON.stringify(newStreak));
-        }
-    }, []);
+    const lastDate = prev.lastVisit ? new Date(prev.lastVisit) : null;
 
-    return streak.count;
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    let newCount = prev.count;
+
+    //? First visit OR visited yesterday
+    if (!lastDate || lastDate.toDateString() === yesterday.toDateString()) {
+      newCount += 1;
+    } else {
+      newCount = 1; //? Missed a day
+    }
+
+    const newStreak = { count: newCount, lastVisit: today };
+    localStorage.setItem("streak", JSON.stringify(newStreak));
+
+    return newStreak;
+  });
+
+  return streak.count;
 }
