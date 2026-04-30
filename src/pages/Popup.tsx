@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PopupLayout from '../components/layout/PopupLayout';
 import Button from '../components/ui/Button';
 import VerseCard from '../components/features/VerseCard';
@@ -15,15 +15,11 @@ export default function Popup() {
     const [loading, setLoading] = useState(false);
     const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState<Verse[]>([]);
 
-    useEffect(() => {
-        if (searchQuery) {
-            setSearchResults(searchVerses(searchQuery.trim()));
-        } else {
-            setSearchResults([]);
-        }
-    }, [searchQuery]);
+    const searchResults: Verse[] =
+    searchQuery.trim() !== ''
+        ? searchVerses(searchQuery.trim()) //?compute directly
+        : []; 
 
     const { favorites } = useFavorites();
 
@@ -32,7 +28,7 @@ export default function Popup() {
         setTimeout(() => {
             setVerse(type === 'random' ? getRandomVerse() : getDailyVerse());
             setLoading(false);
-        }, 300); // Artificial delay for smooth transition
+        }, 300); //? Artificial delay for smooth transition
     };
 
     return (
