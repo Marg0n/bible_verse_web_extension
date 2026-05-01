@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import PopupLayout from '../components/layout/PopupLayout';
 import Button from '../components/ui/Button';
 import VerseCard from '../components/features/VerseCard';
@@ -15,11 +15,17 @@ export default function Popup() {
     const [loading, setLoading] = useState(false);
     const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
 
-    const searchResults: Verse[] =
-    searchQuery.trim() !== ''
-        ? searchVerses(searchQuery.trim()) //?compute directly
-        : []; 
+    // const searchResults: Verse[] =
+    // searchQuery.trim() !== ''
+    //     ? searchVerses(searchQuery.trim()) //?compute directly
+    //     : []; 
+
+    const searchResults = useMemo(() => {
+        if (debouncedQuery.trim() === '') return [];
+        return searchVerses(debouncedQuery.trim());
+    }, [debouncedQuery]);
 
     const { favorites } = useFavorites();
 
@@ -30,6 +36,14 @@ export default function Popup() {
             setLoading(false);
         }, 300); //? Artificial delay for smooth transition
     };
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedQuery(searchQuery);
+        }, 200); //? 200ms delay
+
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
 
     return (
         <PopupLayout 
