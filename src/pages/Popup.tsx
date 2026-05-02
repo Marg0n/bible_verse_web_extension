@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PopupLayout from '../components/layout/PopupLayout';
 import Button from '../components/ui/Button';
 import VerseCard from '../components/features/VerseCard';
@@ -17,33 +17,41 @@ export default function Popup() {
     const [searchQuery, setSearchQuery] = useState('');
     const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
 
-    // const searchResults: Verse[] =
-    // searchQuery.trim() !== ''
-    //     ? searchVerses(searchQuery.trim()) //?compute directly
-    //     : []; 
-
-    const searchResults = useMemo(() => {
-        if (debouncedQuery.trim() === '') return [];
-        return searchVerses(debouncedQuery.trim());
-    }, [debouncedQuery]);
-
+    
     const { favorites } = useFavorites();
 
-    const handleNewVerse = (type: 'random' | 'daily') => {
+    //* Search verses
+    const searchResults: Verse[] = useMemo(() => {
+        if (debouncedQuery.trim() === '') return [];
+        return searchVerses(debouncedQuery.trim()); //?compute directly
+    }, [debouncedQuery]);
+
+    //* Handle verse
+    const handleNewVerse = useCallback((type: 'random' | 'daily') => {
         setLoading(true);
         setTimeout(() => {
             setVerse(type === 'random' ? getRandomVerse() : getDailyVerse());
             setLoading(false);
-        }, 300); //? Artificial delay for smooth transition
-    };
+        }, 500); //? Artificial delay for smooth transition
+    }, []);
 
+    //* Debouncing the search input
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedQuery(searchQuery);
-        }, 200); //? 200ms delay
+        }, 500); //? 500ms delay
 
         return () => clearTimeout(timer);
     }, [searchQuery]);
+
+    //* Date formatting as MMM DD YYYY
+    const today = useMemo(() => {
+        return new Date().toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+        });
+    }, []);
 
     return (
         <PopupLayout 
@@ -83,7 +91,7 @@ export default function Popup() {
                         />
                     </div>
                     <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest opacity-80 whitespace-nowrap">
-                        {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {today}
                     </p>
                 </div>
 
@@ -99,6 +107,7 @@ export default function Popup() {
                                     onClick={() => {
                                         setVerse(v);
                                         setSearchQuery('');
+                                        (document.activeElement as HTMLElement)?.blur(); //? remove input focus
                                     }}
                                     className="p-2 rounded-lg bg-zinc-900/30 border border-zinc-800/30 hover:border-zinc-700/50 hover:bg-zinc-900/50 transition-all cursor-pointer group"
                                 >
