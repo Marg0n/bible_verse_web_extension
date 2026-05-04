@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Bible Verse",
-  "description": "Get daily Bible verses with English and Bengali translations. Save favorites, track your reading streak, and share verses with friends.",
-  "version": "0.0.01",
+  "description": "Get daily Bible verses in English and Bengali. Save favorites, track reading streaks, and share verses.",
+  "version": "0.0.1",
   "icons": {
     "16": "icons/icon-16.png",
     "48": "icons/icon-48.png",
@@ -15,9 +15,12 @@
       "48": "icons/icon-48.png",
       "128": "icons/icon-128.png"
     },
-    "default_title": "Daily Bible Verse"
+    "default_title": "Bible Verse"
   },
   "permissions": [
     "storage"
+  ],
+  "host_permissions": [
+    "https://api.example.com/*"
   ]
 }
