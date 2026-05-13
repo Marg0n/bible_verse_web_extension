@@ -1,8 +1,7 @@
 ![Cover](public/icons/Bible_Mockup.png)
 
 # Bible Verse Web Extension — Frontend
-
-A simple browser extension that delivers random Bible verses daily in Bangla with English translation, bringing peace and comfort to your day.
+A simple browser extension that delivers a random Bible verse daily in Bangla with an English translation, bringing peace and comfort to your day.
 
 ---
 
@@ -78,3 +77,11 @@ That's it - the extension icon will appear in your toolbar.
 2. Create a feature branch: `git checkout -b feature/my-feature`
 3. Build and test in Chrome using the **Load unpacked** flow above
 4. Submit a pull request
+
+---
+
+### ⚙️ Backend | [Github Repo](https://github.com/Marg0n/bible_verse)
+
+---
+
+ 
