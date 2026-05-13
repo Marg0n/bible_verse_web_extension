@@ -47,7 +47,7 @@ npm run build:extension
 
 ---
 
-## Loading the Extension in Chrome
+## Getting Started
 
 1. Run `npm run build:extension`
 2. Open `chrome://extensions/` in Chrome
@@ -55,7 +55,7 @@ npm run build:extension
 4. Click **Load unpacked**
 5. Select the `dist/` folder
 
-That's it — the extension icon will appear in your toolbar.
+That's it - the extension icon will appear in your toolbar.
 
 ---
 
