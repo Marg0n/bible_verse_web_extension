@@ -6,10 +6,10 @@ A simple browser extension that delivers random Bible verses daily in Bangla wit
 
 ## What It Does
 
-📖 Displays a Random Bible verse daily in your browser pop-up
-🔍 Search verses by keyword
-💾 Save and share your favorite verses 
-⚡ Fast, lightweight, and distraction-free
+📖 Displays a Random Bible verse daily in your browser pop-up <br>
+🔍 Search verses by keyword <br>
+💾 Save and share your favorite verses <br>
+⚡ Fast, lightweight, and distraction-free <br>
 
 ---
 
