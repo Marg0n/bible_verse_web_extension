@@ -1,3 +1,5 @@
+![Cover](public/icons/Bible_Mockup.png)
+
 # Bible Verse Web Extension — Frontend
 
 A simple browser extension that delivers random Bible verses daily in Bangla with English translation, bringing peace and comfort to your day.
