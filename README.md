@@ -74,6 +74,8 @@ That's it - the extension icon will appear in your toolbar.
 
 ## Contributing
 
+> **If  you want to contribute, here's how you can:**
+
 1. Fork the repo
 2. Create a feature branch: `git checkout -b feature/my-feature`
 3. Build and test in Chrome using the **Load unpacked** flow above
