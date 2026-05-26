@@ -50,7 +50,7 @@ npm run build: extension
 
 ## Getting Started
 
-1. Run `npm run build:extension`
+1. Run `npm run build: extension.`
 2. Open `chrome://extensions/` in Chrome
 3. Enable **Developer Mode** (top-right toggle)
 4. Click **Load unpacked**
