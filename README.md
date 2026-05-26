@@ -8,9 +8,9 @@ A simple browser extension that delivers a random Bible verse daily in Bangla wi
 ## What It Does
 
 📖 Displays a Random Bible verse daily in your browser pop-up <br>
-<!-- 🔍 Search verses by keyword <br> -->
 💾 Save and share your favorite verses <br>
 ⚡ Fast, lightweight, and distraction-free <br>
+<!-- 🔍 Search verses by keyword <br> -->
 
 ---
 
