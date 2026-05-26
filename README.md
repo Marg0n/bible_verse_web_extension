@@ -43,7 +43,7 @@ npm run dev
 npm run build
 
 # Chrome Extension build
-npm run build:extension
+npm run build: extension
 ```
 
 ---
