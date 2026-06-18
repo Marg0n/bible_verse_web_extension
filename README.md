@@ -48,7 +48,6 @@ npm run build
 npm run build: extension
 ```
 
----
 
 ## Getting Started
 
@@ -60,7 +59,6 @@ npm run build: extension
 
 That's it - the extension icon will appear in your toolbar.
 
----
 
 ## Roadmap
 
@@ -90,7 +88,6 @@ Thank you to all the people who have contributed!
   <img src="https://contrib.rocks/image?repo=Marg0n/bible_verse_web_extension" />
 </a>
 
----
 
 ## Related to the Project
 #### ⚙️ [Backend](https://github.com/Marg0n/bible_verse)
@@ -98,5 +95,7 @@ Thank you to all the people who have contributed!
 
 
 ## [License](https://github.com/Marg0n/bible_verse_web_extension?tab=notice-ov-file)
+
+[Copyright](https://github.com/Marg0n/bible_verse_web_extension/blob/main/NOTICE.md) is being reserved by the [Author](https://github.com/Marg0n/bible_verse_web_extension/blob/main/AUTHORS).
 
 This project is [Apache Licensed](https://github.com/Marg0n/bible_verse_web_extension/blob/main/LICENSE).
