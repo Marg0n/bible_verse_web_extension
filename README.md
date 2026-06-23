@@ -91,7 +91,7 @@ Thank you to all the people who have contributed!
 
 ## Related to the Project
 #### ⚙️ [Backend](https://github.com/Marg0n/bible_verse)
-#### 📱 [Mobile App](https://github.com/Marg0n/)
+#### 📱 [Mobile App](https://github.com/Marg0n/bible_verse_mobile_app?tab=readme-ov-file)
 
 
 ## [License](https://github.com/Marg0n/bible_verse_web_extension?tab=notice-ov-file)
