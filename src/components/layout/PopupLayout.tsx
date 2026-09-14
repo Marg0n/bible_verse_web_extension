@@ -1,7 +1,7 @@
 import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
-import Container from '../ui/Container';
+import Container from './Container';
 
 interface Props {
     children: React.ReactNode;
