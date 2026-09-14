@@ -79,6 +79,7 @@ export default function Popup() {
                 </div>
             }
         >
+            {/* Body */}
             <div className="flex flex-col gap-3">
                 {/* Search & Date Compact Layout */}
                 <div className="flex items-center justify-between gap-4 px-1">
