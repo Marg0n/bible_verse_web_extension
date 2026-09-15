@@ -1,110 +1,172 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import PopupLayout from '../components/layout/PopupLayout';
-import Button from '../components/ui/Button';
-import VerseCard from '../components/features/VerseCard';
-import Input from '../components/ui/Input';
-import StreakBadge from '../components/features/StreakBadge';
-import FavoriteButton from '../components/features/FavoriteButton';
-import ShareMenu from '../components/features/ShareMenu';
-import { useFavorites } from '../hooks/useFavorites';
-import { getDailyVerse, getRandomVerse, searchVerses } from '../services/api';
-import type { Verse } from '../types';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import PopupLayout from "../components/layout/PopupLayout";
+import Button from "../components/ui/Button";
+import VerseCard from "../components/features/VerseCard";
+import Input from "../components/ui/Input";
+import StreakBadge from "../components/features/StreakBadge";
+import FavoriteButton from "../components/features/FavoriteButton";
+import ShareMenu from "../components/features/ShareMenu";
+import { useFavorites } from "../hooks/useFavorites";
+import { getDailyVerse, getRandomVerse, searchVerses } from "../services/api";
+import { useDailyVerse } from "../hooks/useDailyVerse";
+import type { VerseData } from "../types/bible.types";
 
 export default function Popup() {
-    const [verse, setVerse] = useState<Verse>(getDailyVerse());
-    const [loading, setLoading] = useState(false);
-    const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
+  //* Hooks
+  const { bibleVerse, loading, error } = useDailyVerse();
 
-    
-    const { favorites } = useFavorites();
+  //* States
+//   const [verse, setVerse] = useState<VerseData | null>(null);
+  const [overrideVerse, setOverrideVerse] = useState<VerseData | null>(null); //? Instead of storing the main verse, we track if the user manually selected a different one
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
 
-    //* Search verses
-    const searchResults: Verse[] = useMemo(() => {
-        if (debouncedQuery.trim() === '') return [];
-        return searchVerses(debouncedQuery.trim()); //?compute directly
-    }, [debouncedQuery]);
+  const { favorites } = useFavorites();
 
-    //* Handle verse
-    const handleNewVerse = useCallback((type: 'random' | 'daily') => {
-        setLoading(true);
-        setTimeout(() => {
-            setVerse(type === 'random' ? getRandomVerse() : getDailyVerse());
-            setLoading(false);
-        }, 500); //? Artificial delay for smooth transition
-    }, []);
+  //* DERIVED STATE: Using the override if it exists, otherwise use the fetching bibleVerse automatically!
+  const verse = overrideVerse ?? bibleVerse;
 
-    //* Debouncing the search input
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedQuery(searchQuery);
-        }, 500); //? 500ms delay
+  //* Handle verse selection (random or daily)
+  const handleNewVerse = useCallback(
+    (type: "random" | "daily") => {
+      setSearchLoading(true);
+      setTimeout(() => {
+        if (type === "daily") {
+          setOverrideVerse(null); //? Clearing override makes it fall back to bibleVerse
+        } else {
+          // If random, set your override verse here:
+          // setOverrideVerse(getRandomVerse());
+          setOverrideVerse(bibleVerse);
+        }
+        setSearchLoading(false);
+      }, 500);
+    },
+    [bibleVerse],
+  );
 
-        return () => clearTimeout(timer);
-    }, [searchQuery]);
+  //* Debouncing the search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 500); //? 500ms delay
 
-    //* Date formatting as MMM DD YYYY
-    const today = useMemo(() => {
-        return new Date().toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-        });
-    }, []);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-    return (
-        <PopupLayout 
-            title="Bible Verse"
-            headerAction={
-                <div className="flex items-center gap-3">
-                    <StreakBadge />
-                </div>
-            }
-            footer={
-                <div className="flex w-full items-center justify-center gap-3 px-0.5 py-1">
-                    <ShareMenu verse={verse} />
-                    <FavoriteButton verse={verse} />
-                    <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-10 w-10 p-0 rounded-full transition-all duration-200 active:scale-125 text-white hover:text-zinc-200 group"
-                        onClick={() => handleNewVerse('random')}
-                        title="Random Verse"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500">
-                            <path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
-                        </svg>
-                    </Button>
-                </div>
-            }
-        >
-            {/* Body */}
-            <div className="flex flex-col gap-3">
-                {/* Search & Date Compact Layout */}
-                <div className="flex items-center justify-between gap-4 px-1">
-                    <div className="flex-1 max-w-[140px] relative">
-                        <Input 
-                            placeholder="Search verses..." 
-                            value={searchQuery}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                            className="h-8 text-[11px] border-zinc-800/50 focus:bg-zinc-900/50"
-                        />
-                    </div>
-                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest opacity-80 whitespace-nowrap">
-                        {today}
-                    </p>
-                </div>
+  //* Search verses
+  // const searchResults: VerseData[] = useMemo(() => {
+  //     if (debouncedQuery.trim() === '') return [];
+  //     return searchVerses(debouncedQuery.trim()); //?compute directly
+  // }, [debouncedQuery]);
 
-                {/* Search Results Dropdown */}
-                {searchQuery.trim() !== '' && (
+  // //* Handle verse
+  //   const handleNewVerse = useCallback((type: 'random' | 'daily') => {
+  //     setSearchLoading(true);
+  //     setTimeout(() => {
+  //       // setVerse(type === 'random' ? getRandomVerse() : getDailyVerse());
+  //       setVerse(
+  //         type === "random"
+  //           ? (bibleVerse as VerseData)
+  //           : (bibleVerse as VerseData),
+  //       );
+  //       setSearchLoading(false);
+  //     }, 500); //? Artificial delay for smooth transition
+  //   }, []);
+
+  //* Debouncing the search input
+  // useEffect(() => {
+  //     const timer = setTimeout(() => {
+  //         setDebouncedQuery(searchQuery);
+  //     }, 500); //? 500ms delay
+
+  //     return () => clearTimeout(timer);
+  // }, [searchQuery]);
+
+  //* Date formatting as MMM DD YYYY
+  const today = useMemo(() => {
+    return new Date().toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  }, []);
+  console.log("popup", verse);
+  //   console.log("popup bv", bibleVerse);
+
+  if (loading) return <div>Loading today's verse...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!verse) return null;
+
+  return (
+    <PopupLayout
+      title="Bible Verse"
+      headerAction={
+        <div className="flex items-center gap-3">
+          <StreakBadge />
+        </div>
+      }
+      footer={
+        <div className="flex w-full items-center justify-center gap-3 px-0.5 py-1">
+          <ShareMenu verse={verse} />
+          {/* <FavoriteButton verse={verse} /> */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-10 w-10 p-0 rounded-full transition-all duration-200 active:scale-125 text-white hover:text-zinc-200 group"
+            // onClick={() => handleNewVerse("random")}
+            title="Random Verse"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500"
+            >
+              <path d="M21 2v6h-6" />
+              <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+              <path d="M3 22v-6h6" />
+              <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+            </svg>
+          </Button>
+        </div>
+      }
+    >
+      {/* Body */}
+      <div className="flex flex-col gap-3">
+        {/* Search & Date Compact Layout */}
+        <div className="flex items-center justify-between gap-4 px-1">
+          <div className="flex-1 max-w-[140px] relative">
+            <Input
+              placeholder="Search verses..."
+              value={searchQuery}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setSearchQuery(e.target.value)
+              }
+              className="h-8 text-[11px] border-zinc-800/50 focus:bg-zinc-900/50"
+            />
+          </div>
+          <p className="text-[10px] font-bold text-zinc-900 uppercase tracking-widest opacity-80 whitespace-nowrap">
+            {today}
+          </p>
+        </div>
+
+        {/* Search Results Dropdown */}
+        {/* {searchQuery.trim() !== '' && (
                     <div className="flex flex-col gap-2 max-h-32 overflow-y-auto px-1">
                         {searchResults.length === 0 ? (
                             <p className="text-xs text-zinc-600 font-medium py-1">No verses found.</p>
                         ) : (
                             searchResults.map((v) => (
                                 <div 
-                                    key={v.reference}
+                                    key={v.verse}
                                     onClick={() => {
                                         setVerse(v);
                                         setSearchQuery('');
@@ -124,24 +186,28 @@ export default function Popup() {
                             ))
                         )}
                     </div>
-                )}
+                )} */}
 
-                {/* Main Verse Display */}
-                {searchQuery.trim() === '' && (
-                    <VerseCard verse={verse} loading={loading} />
-                )}
+        {/* Main Verse Display */}
+        {searchQuery.trim() === "" && (
+          <VerseCard verse={verse} loading={searchLoading} />
+        )}
 
-                {/* Favorites Section (Collapsible) */}
-                <div className="pt-2 border-t border-zinc-800/20">
-                    <button 
-                        onClick={() => setIsFavoritesOpen(!isFavoritesOpen)}
-                        className="flex items-center justify-between w-full text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1 hover:text-zinc-300 transition-colors"
-                    >
-                        <span>Saved Verses ({favorites.length})</span>
-                        <span className={`transition-transform duration-300 ${isFavoritesOpen ? 'rotate-180' : 'rotate-0'}`}>▼</span>
-                    </button>
-                    
-                    {isFavoritesOpen && (
+        {/* Favorites Section (Collapsible) */}
+        <div className="pt-2 border-t border-zinc-800/20">
+          <button
+            onClick={() => setIsFavoritesOpen(!isFavoritesOpen)}
+            className="flex items-center justify-between w-full text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1 hover:text-zinc-300 transition-colors"
+          >
+            <span>Saved Verses ({favorites.length})</span>
+            <span
+              className={`transition-transform duration-300 ${isFavoritesOpen ? "rotate-180" : "rotate-0"}`}
+            >
+              ▼
+            </span>
+          </button>
+
+          {/* {isFavoritesOpen && (
                         <div className="mt-4 space-y-3 px-1">
                             {favorites.length === 0 ? (
                                 <p className="text-xs text-zinc-600 font-medium py-2">No saved verses yet.</p>
@@ -164,9 +230,9 @@ export default function Popup() {
                                 ))
                             )}
                         </div>
-                    )}
-                </div>
-            </div>
-        </PopupLayout>
-    );
+                    )} */}
+        </div>
+      </div>
+    </PopupLayout>
+  );
 }
