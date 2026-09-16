@@ -11,6 +11,7 @@ import { getDailyVerse, getRandomVerse, searchVerses } from "../services/api";
 import { useDailyVerse } from "../hooks/useDailyVerse";
 import type { VerseData } from "../types/bible.types";
 import useRandomVerse from "../hooks/useRandomVerse";
+import { BsCalendar2Month } from "react-icons/bs";
 
 export default function Popup() {
   //* Hooks
@@ -41,9 +42,10 @@ export default function Popup() {
 
     if (type === "daily") {
       setOverrideVerse(null); //? Clearing override makes it fall back to bibleVerse / daily verse instantly
+      setSearchLoading(false);
       return;
     }
-    setSearchLoading(true);
+    
     //? Fetch a fresh random verse from the backend on click!
     const newRandom = await fetchRandomVerse();
     if (newRandom) {
@@ -118,6 +120,7 @@ export default function Popup() {
         <div className="flex w-full items-center justify-center gap-3 px-0.5 py-1">
           <ShareMenu verse={verse} />
           {/* <FavoriteButton verse={verse} /> */}
+          {/* Random Verse */}
           <Button
             variant="ghost"
             size="sm"
@@ -143,6 +146,12 @@ export default function Popup() {
               <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
             </svg>
           </Button>
+
+          {/* Daily Verse */}
+          <BsCalendar2Month
+            className="text-lg text-zinc-400 hover:text-white cursor-pointer transition-colors duration-200"
+            onClick={() => handleNewVerse("daily")}
+          />
         </div>
       }
     >

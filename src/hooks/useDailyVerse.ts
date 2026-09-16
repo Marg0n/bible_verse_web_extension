@@ -12,16 +12,30 @@ export function useDailyVerse() {
   useMemo(() => {
     const fetchDailyVerse = async () => {
       try {
-        const response = await fetch(`${baseUrl}/bible`);
+        const today = new Date().toISOString().split("T")[0]; //? e.g., "2026-09-16"
+        const cachedDate = localStorage.getItem("daily_verse_date");
+        const cachedVerse = localStorage.getItem("daily_verse_data");
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch the daily verse");
+        // If today's verse is already saved, use it and skip the API call!
+        if (cachedDate === today && cachedVerse) {
+          setBibleVerse(JSON.parse(cachedVerse));
+          setLoading(false);
+          return;
         }
 
-        const data = await response.json();
+        //? Otherwise, fetch a fresh one for the new day
+        const response = await fetch(`${baseUrl}/bible`);
+        if (!response.ok) throw new Error("Failed to fetch the daily verse");
 
-        setBibleVerse(data?.data);
-      } catch (err: any) {
+        const data = await response.json();
+        const verseData = data?.data;
+
+        //? Update state and store it in localStorage with today's date
+        setBibleVerse(verseData);
+        localStorage.setItem("daily_verse_date", today);
+        localStorage.setItem("daily_verse_data", JSON.stringify(verseData));
+      } 
+      catch (err: any) {
         setError(err.message || "Something went wrong");
       }
       finally {
