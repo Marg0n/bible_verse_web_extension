@@ -1,3 +1,4 @@
+import { toBanglaDigits } from "../../helper/EnToBnDigit";
 import type { VerseData } from "../../types/bible.types";
 import Card from "../ui/Card";
 
@@ -28,7 +29,7 @@ export default function VerseCard({ verse, loading }: Props) {
         <p className="text-lg font-medium leading-relaxed text-zinc-100 group-hover/card:text-white transition-colors duration-300">
           "{verse.text_en}"
         </p>
-        {/* Footer: Reference */}
+        {/* Footer: En Reference */}
         <div className="flex justify-end -mt-1">
           <p className="text-[11px] font-bold text-yellow-500 uppercase tracking-widest opacity-100">
             — {verse.book_en} {verse.chapter} : {verse.verse}
@@ -42,10 +43,11 @@ export default function VerseCard({ verse, loading }: Props) {
           </p>
         </div>
 
-        {/* Footer: Reference */}
+        {/* Footer: Bn Reference */}
         <div className="flex justify-end -mt-1">
           <p className="text-[11px] font-bold text-yellow-500 uppercase tracking-widest opacity-100">
-            — {verse.book_bn} {verse.chapter} : {verse.verse}
+            — {verse.book_bn} {toBanglaDigits(verse.chapter)} :{" "}
+            {toBanglaDigits(verse.verse)}
           </p>
         </div>
       </div>
