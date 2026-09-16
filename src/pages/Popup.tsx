@@ -10,13 +10,20 @@ import { useFavorites } from "../hooks/useFavorites";
 import { getDailyVerse, getRandomVerse, searchVerses } from "../services/api";
 import { useDailyVerse } from "../hooks/useDailyVerse";
 import type { VerseData } from "../types/bible.types";
+import useRandomVerse from "../hooks/useRandomVerse";
 
 export default function Popup() {
   //* Hooks
   const { bibleVerse, loading, error } = useDailyVerse();
+  const {
+    randomVerse,
+    loading: ranLoading,
+    error: ranError,
+    fetchRandomVerse,
+  } = useRandomVerse();
 
   //* States
-//   const [verse, setVerse] = useState<VerseData | null>(null);
+  //   const [verse, setVerse] = useState<VerseData | null>(null);
   const [overrideVerse, setOverrideVerse] = useState<VerseData | null>(null); //? Instead of storing the main verse, we track if the user manually selected a different one
   const [searchLoading, setSearchLoading] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
@@ -25,26 +32,26 @@ export default function Popup() {
 
   const { favorites } = useFavorites();
 
-  //* DERIVED STATE: Using the override if it exists, otherwise use the fetching bibleVerse automatically!
+  //* DERIVED STATE: Always defaults to daily bibleVerse, but instantly switches to overrideVerse if the user clicked random.
   const verse = overrideVerse ?? bibleVerse;
 
   //* Handle verse selection (random or daily)
-  const handleNewVerse = useCallback(
-    (type: "random" | "daily") => {
-      setSearchLoading(true);
-      setTimeout(() => {
-        if (type === "daily") {
-          setOverrideVerse(null); //? Clearing override makes it fall back to bibleVerse
-        } else {
-          // If random, set your override verse here:
-          // setOverrideVerse(getRandomVerse());
-          setOverrideVerse(bibleVerse);
-        }
-        setSearchLoading(false);
-      }, 500);
-    },
-    [bibleVerse],
-  );
+  const handleNewVerse = async (type: "random" | "daily") => {
+    setSearchLoading(true);
+
+    if (type === "daily") {
+      setOverrideVerse(null); //? Clearing override makes it fall back to bibleVerse / daily verse instantly
+      return;
+    }
+    setSearchLoading(true);
+    //? Fetch a fresh random verse from the backend on click!
+    const newRandom = await fetchRandomVerse();
+    if (newRandom) {
+      setOverrideVerse(newRandom);
+    }
+
+    setSearchLoading(false);
+  };
 
   //* Debouncing the search input
   useEffect(() => {
@@ -115,7 +122,7 @@ export default function Popup() {
             variant="ghost"
             size="sm"
             className="h-10 w-10 p-0 rounded-full transition-all duration-200 active:scale-125 text-white hover:text-zinc-200 group"
-            // onClick={() => handleNewVerse("random")}
+            onClick={() => handleNewVerse("random")}
             title="Random Verse"
           >
             <svg
