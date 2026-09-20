@@ -27,7 +27,7 @@ export default function VerseCard({ verse, loading }: Props) {
       <div className="space-y-5">
         {/* English Section */}
         <p className="text-lg font-medium leading-relaxed text-zinc-100 group-hover/card:text-white transition-colors duration-300">
-          "{verse.text_en}"
+          {verse.text_en}
         </p>
         {/* Footer: En Reference */}
         <div className="flex justify-end -mt-1">
@@ -39,7 +39,7 @@ export default function VerseCard({ verse, loading }: Props) {
         {/* Bengali Section */}
         <div className="pt-5 border-t border-zinc-800/30">
           <p className="text-base font-medium leading-relaxed text-zinc-300 group-hover/card:text-zinc-200 transition-colors duration-300 italic">
-            "{verse.text_bn}"
+            {verse.text_bn}
           </p>
         </div>
 

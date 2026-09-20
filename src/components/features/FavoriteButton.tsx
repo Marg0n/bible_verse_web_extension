@@ -14,7 +14,7 @@ export default function FavoriteButton({ verse }: Props) {
     <Button
       variant="ghost"
       size="sm"
-      className={`h-10 w-10 p-0 rounded-full transition-all duration-200 active:scale-125 ${active ? "text-yellow-500" : "text-white hover:text-zinc-200"}`}
+      className={`h-10 w-10 p-0 rounded-full transition-all duration-200 active:scale-125 ${active ? "text-yellow-500" : "text-white hover:text-zinc-200"} cursor-pointer`}
       onClick={() => toggleFavorite(verse)}
       title={active ? "Remove from Favorites" : "Save to Favorites"}
     >

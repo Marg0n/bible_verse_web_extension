@@ -53,7 +53,7 @@ export default function ShareMenu({ verse }: Props) {
       <Button
         variant="ghost"
         size="sm"
-        className={`h-10 w-10 p-0 rounded-full transition-all duration-200 active:scale-125 group ${isOpen ? "text-zinc-200 bg-zinc-800/50" : "text-white hover:text-zinc-200"}`}
+        className={`h-10 w-10 p-0 rounded-full transition-all duration-200 active:scale-125 group ${isOpen ? "text-zinc-200 bg-zinc-800/50" : "text-white hover:text-zinc-200"} cursor-pointer`}
         onClick={() => setIsOpen(!isOpen)}
         title="Share Verse"
       >
