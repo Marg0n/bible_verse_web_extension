@@ -21,6 +21,7 @@
     "storage"
   ],
   "host_permissions": [
-    "https://api.example.com/*"
+    "https://api.example.com/*",
+    "http://localhost:3000"
   ]
 }
