@@ -141,26 +141,28 @@ export default function Popup() {
       headerAction={
         <div className="flex items-center gap-3">
           {isLoggedIn ? (
-            <BsPersonBoundingBox
-              className="text-lg text-zinc-400 hover:text-white cursor-pointer transition-colors duration-200"
-              onClick={() => {
-                // Logout logic
-                localStorage.removeItem("auth_token");
-                setIsLoggedIn(false);
-              }}
-              title="Logout"
-            />
+            <>
+              <BsPersonBoundingBox
+                className="text-lg text-zinc-400 hover:text-white cursor-pointer transition-colors duration-200"
+                onClick={() => {
+                  // Logout logic
+                  localStorage.removeItem("auth_token");
+                  setIsLoggedIn(false);
+                }}
+                title="Logout"
+              />
+              <StreakBadge />
+            </>
           ) : (
             <Button
               size="sm"
               variant="ghost"
               onClick={() => setAuthView("login")}
-              className="text-xs text-blue-400 hover:text-white cursor-pointer"
+              className="text-xs text-blue-400 hover:bg-gradient-to-t hover:from-green-100 hover:to-violet-200 hover:text-zinc-900 hover:font-semibold transition-all duration-300 cursor-pointer"
             >
               Login
             </Button>
           )}
-          <StreakBadge />
         </div>
       }
       footer={
