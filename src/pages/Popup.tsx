@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { BsCalendar2Month, BsPersonBoundingBox } from "react-icons/bs";
+import React, { useEffect, useMemo, useState } from "react";
+import { BsCalendar2Month } from "react-icons/bs";
 import { GiCrossMark } from "react-icons/gi";
 import { Login } from "../components/auth/Login";
 import Registration from "../components/auth/Registration";
@@ -16,6 +16,9 @@ import { useFavorites } from "../hooks/useFavorites";
 import useRandomVerse from "../hooks/useRandomVerse";
 import { useVerseSearch } from "../hooks/useVerseSearch";
 import type { VerseData } from "../types/bible.types";
+import { FaRandom } from "react-icons/fa";
+import { logout } from "../utils/logout";
+import { RiLogoutCircleLine } from "react-icons/ri";
 
 //* Define the views will be showing
 type AuthView = "home" | "login" | "register";
@@ -25,7 +28,7 @@ export default function Popup() {
   const [authView, setAuthView] = useState<AuthView>("home");
   //* Check initial login status from storage on load
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    const token = localStorage.getItem("auth_token");
+    const token = sessionStorage.getItem("access_token");
     return !!token; //? Returns true if token exists, false if null
   });
 
@@ -51,6 +54,7 @@ export default function Popup() {
   //* Constants
   const verse = overrideVerse ?? bibleVerse;
 
+  //* Daily or New verse handler
   const handleNewVerse = async (type: "random" | "daily") => {
     setSearchLoading(true);
     if (type === "daily") {
@@ -63,6 +67,30 @@ export default function Popup() {
     if (newRandom) setOverrideVerse(newRandom);
     setSearchLoading(false);
   };
+
+  //* Refetching Daily verse handler
+  const handleRefetchNewVerse = async () => {
+    //? Removing localhost data
+    sessionStorage.removeItem("daily_verse_date");
+    sessionStorage.removeItem("daily_verse_data");
+
+    setSearchLoading(true);
+
+    setOverrideVerse(null);
+    setSearchLoading(false);
+    setSearchResults([]); //? Clearing search results
+    return;
+  };
+
+  //* Listen for forced logout (e.g. refresh token expired)
+  useEffect(() => {
+    const handleForcedLogout = () => {
+      setIsLoggedIn(false);
+      setAuthView("home");
+    };
+    window.addEventListener("auth:logout", handleForcedLogout);
+    return () => window.removeEventListener("auth:logout", handleForcedLogout);
+  }, []);
 
   //* Date formatting as MMM DD YYYY
   const today = useMemo(() => {
@@ -121,7 +149,7 @@ export default function Popup() {
           <Registration
             onRegisterSuccess={() => {
               setIsLoggedIn(true);
-              setAuthView("home"); // Return to home after registration
+              setAuthView("home"); //? Return to home after registration
             }}
             switchToLogin={() => setAuthView("login")}
             switchToHome={() => setAuthView("home")}
@@ -139,14 +167,16 @@ export default function Popup() {
       title="Bible Verse"
       className="flex flex-col justify-center items-center"
       headerAction={
+        //? Login status & streak
         <div className="flex items-center gap-3">
           {isLoggedIn ? (
             <>
-              <BsPersonBoundingBox
-                className="text-lg text-zinc-400 hover:text-white cursor-pointer transition-colors duration-200"
+              <RiLogoutCircleLine
+                className="text-lg text-zinc-400 hover:text-white cursor-pointer transition-colors duration-200 active:scale-125"
                 onClick={() => {
                   // Logout logic
-                  localStorage.removeItem("auth_token");
+                  // sessionStorage.removeItem("access_token");
+                  logout();
                   setIsLoggedIn(false);
                 }}
                 title="Logout"
@@ -178,6 +208,28 @@ export default function Popup() {
             onClick={() => handleNewVerse("random")}
             title="Random Verse"
           >
+            <FaRandom size={20} />
+          </Button>
+
+          {/* Daily Verse */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-10 w-10 p-0 rounded-full transition-all duration-200 active:scale-125 text-white hover:text-zinc-200 group"
+          >
+            <BsCalendar2Month
+              className=" text-lg cursor-pointer"
+              onClick={() => handleNewVerse("daily")}
+            />
+          </Button>
+
+          {/* Refresh refetch daily verse */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-10 w-10 p-0 rounded-full transition-all duration-200 active:scale-125 text-white hover:text-zinc-200 group"
+            onClick={() => handleRefetchNewVerse()}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -195,18 +247,6 @@ export default function Popup() {
               <path d="M3 22v-6h6" />
               <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
             </svg>
-          </Button>
-
-          {/* Daily Verse */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-10 w-10 p-0 rounded-full transition-all duration-200 active:scale-125 text-white hover:text-zinc-200 group"
-          >
-            <BsCalendar2Month
-              className=" text-lg cursor-pointer"
-              onClick={() => handleNewVerse("daily")}
-            />
           </Button>
         </div>
       }
@@ -279,7 +319,20 @@ export default function Popup() {
 
         {/* Favorites Section (Restrict or prompt login if not logged in) */}
         <div className="pt-2 border-t border-zinc-800/20">
-          {isLoggedIn ? (
+          {!isLoggedIn ? (
+            <div className="text-center py-3 bg-zinc-900/40 rounded-lg border border-zinc-800/40">
+              <p className="text-[11px] text-zinc-400 mb-2">
+                Login to save and view your favorite verses!
+              </p>
+              <Button
+                size="sm"
+                onClick={() => setAuthView("login")}
+                className="text-xs cursor-pointer"
+              >
+                Login / Register
+              </Button>
+            </div>
+          ) : (
             /* Favorites Section (Collapsible) */
             <div className="pt-2 border-t border-zinc-800/20">
               <button
@@ -299,19 +352,6 @@ export default function Popup() {
                   setVerse={setOverrideVerse}
                 />
               )}
-            </div>
-          ) : (
-            <div className="text-center py-3 bg-zinc-900/40 rounded-lg border border-zinc-800/40">
-              <p className="text-[11px] text-zinc-400 mb-2">
-                Login to save and view your favorite verses!
-              </p>
-              <Button
-                size="sm"
-                onClick={() => setAuthView("login")}
-                className="text-xs cursor-pointer"
-              >
-                Login / Register
-              </Button>
             </div>
           )}
         </div>
