@@ -1,22 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import { MdOutlineMail } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 import { LiaBibleSolid } from "react-icons/lia";
 import type { LoginProps } from "../../types/auth.types";
+import { useLogin } from "../../hooks/useLogin";
 
 export const Login = ({
   onLoginSuccess,
   switchToRegister,
   switchToHome,
 }: LoginProps) => {
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Call backend login API
-    localStorage.setItem("auth_token", "mock_token_123");
-    onLoginSuccess();
-  };
+  //* Login hook
+  const {
+    email,
+    password,
+    error,
+    loading,
+    handleLogin,
+    setEmail,
+    setPassword,
+  } = useLogin(onLoginSuccess);
 
   return (
     <Card
@@ -34,6 +39,8 @@ export const Login = ({
             type="email"
             placeholder="Email address"
             required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="peer border-[#e5eaf2] dark:bg-slate-900 dark:placeholder:text-slate-500 dark:text-[#abc2d3] dark:border-slate-600 border rounded-md outline-none pl-10 pr-4 py-3 w-full focus:border-[#3B9DF8] transition-colors duration-300"
           />
         </div>
@@ -44,17 +51,25 @@ export const Login = ({
             type="password"
             placeholder="Password"
             required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="peer border-[#e5eaf2] dark:bg-slate-900 dark:placeholder:text-slate-500 dark:text-[#abc2d3] dark:border-slate-600 border rounded-md outline-none pl-10 pr-4 py-3 w-full focus:border-[#3B9DF8] transition-colors duration-300"
           />
         </div>
+
+        {/* error message */}
+        {error && (
+          <p className="w-full text-sm text-red-400 text-center">{error}</p>
+        )}
 
         <div className="flex flex-col items-center gap-3 w-full mt-2">
           <Button
             type="submit"
             className="w-full hover:bg-gradient-to-t hover:from-green-100 hover:to-violet-200 hover:text-zinc-900 hover:font-semibold transition-all duration-300 hover:cursor-pointer"
             variant="ghost"
+            disabled={loading}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </Button>
 
           <button
