@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import { LiaBibleSolid } from "react-icons/lia";
 import { MdOutlineMail } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
-import Card from "../ui/Card";
-import Button from "../ui/Button";
-import { LiaBibleSolid } from "react-icons/lia";
-import type { LoginProps } from "../../types/auth.types";
 import { useLogin } from "../../hooks/useLogin";
+import type { LoginProps } from "../../types/auth.types";
+import Button from "../ui/Button";
+import Card from "../ui/Card";
 
 export const Login = ({
   onLoginSuccess,
