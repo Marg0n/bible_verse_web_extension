@@ -46,7 +46,7 @@ export const useVerseSearch = (searchQuery: string) => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  console.log(searchResults, searchLoading, searchError )
+  // console.log(searchResults, searchLoading, searchError )
 
   return { searchResults, searchLoading, searchError, setSearchResults };
 };

@@ -1,21 +1,26 @@
-import { useFavorites } from "../../hooks/useFavorites";
-import type { VerseData } from "../../types/bible.types";
+import type { FavoriteButtonProps } from "../../types/favorite.types";
 import Button from "../ui/Button";
 
-interface Props {
-  verse: VerseData;
-}
+export default function FavoriteButton({
+  verseId,
+  isFavorite,
+  addFavorite,
+  removeFavorite,
+}: FavoriteButtonProps) {
+  // const { addFavorite, removeFavorite, isFavorite } = useFavorites();
+  const active = isFavorite(verseId);
 
-export default function FavoriteButton({ verse }: Props) {
-  const { isFavorite, toggleFavorite } = useFavorites();
-  const active = isFavorite(verse);
+  //? convert veerseId to string
+  const convertedVerseId = verseId.toString();
 
   return (
     <Button
       variant="ghost"
       size="sm"
-      className={`h-10 w-10 p-0 rounded-full transition-all duration-200 active:scale-125 ${active ? "text-yellow-500" : "text-white hover:text-zinc-200"} cursor-pointer`}
-      onClick={() => toggleFavorite(verse)}
+      className={`h-10 w-10 p-0 rounded-full transition-all duration-200 active:scale-125 ${
+        active ? "text-yellow-500" : "text-white hover:text-zinc-200"
+      } cursor-pointer`}
+      onClick={() => (active ? removeFavorite(convertedVerseId) : addFavorite(verseId))} //? toggle
       title={active ? "Remove from Favorites" : "Save to Favorites"}
     >
       <svg

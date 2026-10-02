@@ -1,40 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useCallback } from "react";
-import type { VerseData } from "../types/bible.types";
-import { baseUrl } from "../helper/BaseUrl";
+import type { FavoritesDataType } from "../types/favorite.types";
+import api from "../utils/api"; //? ← fetch wrapper with interceptors
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<VerseData[]>([]);
+  const [favorites, setFavorites] = useState<FavoritesDataType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  //* Helper to get authorization headers if using localStorage token
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("auth_token");
-    return {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    };
-  };
-
   //* Fetch favorites from the backend on mount
   useEffect(() => {
+    const token = sessionStorage.getItem("access_token");
+    if (!token) return; //? no point fetching without auth
+
     const fetchFavorites = async () => {
       try {
         setLoading(true);
-        // 🛠️ Fixed: Changed to GET request and added auth headers
-        const response = await fetch(`${baseUrl}/favorites`, {
-          method: "GET",
-          headers: getAuthHeaders(),
-          credentials: "include",
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch favorites");
-        }
-
-        const data = await response.json();
-        setFavorites(data?.data || []);
+        //? api() auto-attaches the Bearer token + handles 401 refresh
+        const response = await api("/favorites");
+        // console.log("RAW:", JSON.stringify(response));
+        setFavorites(response?.data?.data || []);
+        setError(null);
       } catch (err: any) {
         setError(err.message || "Something went wrong");
       } finally {
@@ -42,46 +28,38 @@ export function useFavorites() {
       }
     };
 
-    fetchFavorites(); //? Invoking the fetch function on mount!
+    fetchFavorites();
   }, []);
 
-  //* Add favorite via backend API
+  //* Listen for forced logout (refresh token expired)
+  useEffect(() => {
+    const handleLogout = () => {
+      setFavorites([]);
+      setError(null);
+    };
+    window.addEventListener("auth:logout", handleLogout);
+    return () => window.removeEventListener("auth:logout", handleLogout);
+  }, []);
+
+  //* Add favorite
   const addFavorite = useCallback(async (verseId: number) => {
     try {
-      const response = await fetch(`${baseUrl}/favorites`, {
-        method: "POST",
-        headers: getAuthHeaders(), //? Added auth headers here too
-        credentials: "include",
-        body: JSON.stringify({ verseId }),
-      });
-
-      if (!response.ok) throw new Error("Failed to add favorite");
-
-      const data = await response.json();
-      
-      //? Fixed: Optimistically update local state so the UI updates instantly
-      //? (Assumes backend returns the added verse or it can refetch/append)
-      if (data?.data) {
-        setFavorites((prev) => [...prev, data.data]);
+      const response = await api.post("/favorites", {
+        verseId: String(verseId),
+      }); //? axios auto-stringifies
+      if (response?.data?.data) {
+        setFavorites((prev) => [...prev, response.data.data]);
       }
     } catch (err: any) {
       console.error("Add favorite error:", err.message);
     }
   }, []);
 
-  //* Remove favorite via backend API
-  const removeFavorite = useCallback(async (verseId: number) => {
+  //* Remove favorite
+  const removeFavorite = useCallback(async (verseId: string) => {
     try {
-      const response = await fetch(`${baseUrl}/favorites/${verseId}`, {
-        method: "DELETE",
-        headers: getAuthHeaders(), //? Added auth headers here too
-        credentials: "include",
-      });
-
-      if (!response.ok) throw new Error("Failed to remove favorite");
-
-      //? Update local state instantly to remove it from UI list
-      setFavorites((prev) => prev.filter((item) => item.verseId !== verseId));
+      await api(`/favorites/${verseId}`, { method: "DELETE" });
+      setFavorites((prev) => prev.filter((item) => item.verseId !== verseId)); //? "18110009" !=  18110009 false (loose equality coerces types, they "match")
     } catch (err: any) {
       console.error("Remove favorite error:", err.message);
     }
@@ -89,15 +67,11 @@ export function useFavorites() {
 
   //* Check if a verse is favorited
   const isFavorite = (verseId: number) => {
-    return favorites.some((item) => item.verseId === verseId);
+    //? convert to int for check
+    const convertVerseId = verseId.toString();
+
+    return favorites.some((item) => item.verseId === convertVerseId);
   };
 
-  return {
-    favorites,
-    loading,
-    error,
-    addFavorite,
-    removeFavorite,
-    isFavorite,
-  };
+  return { favorites, loading, error, addFavorite, removeFavorite, isFavorite };
 }

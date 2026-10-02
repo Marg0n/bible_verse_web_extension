@@ -19,6 +19,7 @@ import type { VerseData } from "../types/bible.types";
 import { FaRandom } from "react-icons/fa";
 import { logout } from "../utils/logout";
 import { RiLogoutCircleLine } from "react-icons/ri";
+import FavoriteButton from "../components/features/FavoriteButton";
 
 //* Define the views will be showing
 type AuthView = "home" | "login" | "register";
@@ -49,7 +50,7 @@ export default function Popup() {
   } = useVerseSearch(searchQuery);
 
   //* Favorites
-  const { favorites } = useFavorites();
+  const { favorites, isFavorite, addFavorite, removeFavorite } = useFavorites();
 
   //* Constants
   const verse = overrideVerse ?? bibleVerse;
@@ -199,7 +200,14 @@ export default function Popup() {
         <div className="flex w-full items-center justify-center gap-3 px-0.5 py-1">
           <ShareMenu verse={verse!} />
           {/* Favorites buttons */}
-          {/* {isLoggedIn && <FavoriteButton verse={verse} />} */}
+          {isLoggedIn && (
+            <FavoriteButton
+              verseId={verse?.verseId as number}
+              isFavorite={isFavorite}
+              addFavorite={addFavorite}
+              removeFavorite={removeFavorite}
+            />
+          )}
           {/* Random Verse */}
           <Button
             variant="ghost"
