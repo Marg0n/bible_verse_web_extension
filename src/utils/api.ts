@@ -11,7 +11,7 @@ const api = axios.create({
 //! ─── REQUEST INTERCEPTOR ───────────────────────────────────────────
 //* Attach the access token to every outgoing request
 api.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem("access_token"); //? ← consistent key
+  const token = sessionStorage.getItem("access_token"); //? consistent key
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
