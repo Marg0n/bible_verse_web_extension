@@ -10,25 +10,28 @@ export function useFavorites() {
 
   //* Fetch favorites from the backend on mount
   useEffect(() => {
-    const token = sessionStorage.getItem("access_token");
-    if (!token) return; //? no point fetching without auth
+    // const token = sessionStorage.getItem("access_token");
+    // if (!token) return; //? no point fetching without auth
+    chrome.storage.session.get("access_token").then(({ access_token }) => {
+      if (!access_token) return;
 
-    const fetchFavorites = async () => {
-      try {
-        setLoading(true);
-        //? api() auto-attaches the Bearer token + handles 401 refresh
-        const response = await api("/favorites");
-        // console.log("RAW:", JSON.stringify(response));
-        setFavorites(response?.data?.data || []);
-        setError(null);
-      } catch (err: any) {
-        setError(err.message || "Something went wrong");
-      } finally {
-        setLoading(false);
-      }
-    };
+      const fetchFavorites = async () => {
+        try {
+          setLoading(true);
+          //? api() auto-attaches the Bearer token + handles 401 refresh
+          const response = await api("/favorites");
+          // console.log("RAW:", JSON.stringify(response));
+          setFavorites(response?.data?.data || []);
+          setError(null);
+        } catch (err: any) {
+          setError(err.message || "Something went wrong");
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    fetchFavorites();
+      fetchFavorites();
+    });
   }, []);
 
   //* Listen for forced logout (refresh token expired)

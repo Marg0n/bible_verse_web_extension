@@ -28,10 +28,19 @@ export default function Popup() {
   //* Start on "home" (public view) or check if they have a saved token
   const [authView, setAuthView] = useState<AuthView>("home");
   //* Check initial login status from storage on load
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    const token = sessionStorage.getItem("access_token");
-    return !!token; //? Returns true if token exists, false if null
-  });
+  // const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+  //   const token = sessionStorage.getItem("access_token");
+  //   return !!token; //? Returns true if token exists, false if null
+  // });
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [booting, setBooting] = useState(true);
+
+  useEffect(() => {
+    chrome.storage.session.get("access_token").then(({ access_token }) => {
+      if (access_token) setIsLoggedIn(true);
+      setBooting(false);
+    });
+  }, []);
 
   //* Hooks
   const { bibleVerse, loading, error } = useDailyVerse();
@@ -72,8 +81,12 @@ export default function Popup() {
   //* Refetching Daily verse handler
   const handleRefetchNewVerse = async () => {
     //? Removing localhost data
-    sessionStorage.removeItem("daily_verse_date");
-    sessionStorage.removeItem("daily_verse_data");
+    // sessionStorage.removeItem("daily_verse_date");
+    // sessionStorage.removeItem("daily_verse_data");
+    await chrome.storage.session.remove([
+      "daily_verse_date",
+      "daily_verse_data",
+    ]);
 
     setSearchLoading(true);
 
@@ -160,6 +173,8 @@ export default function Popup() {
     );
   }
 
+  if (booting) return <Card className="animate-pulse p-6">…</Card>;
+
   //* ==========================================
   //* NORMAL HOME VIEW (Accessible to Everyone)
   //* ==========================================
@@ -191,7 +206,7 @@ export default function Popup() {
               onClick={() => setAuthView("login")}
               className="text-xs text-blue-400 hover:bg-gradient-to-t hover:from-green-100 hover:to-violet-200 hover:text-zinc-900 hover:font-semibold transition-all duration-300 cursor-pointer"
             >
-              Login
+              Login ?
             </Button>
           )}
         </div>

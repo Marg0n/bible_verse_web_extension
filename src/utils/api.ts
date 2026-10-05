@@ -11,11 +11,17 @@ const api = axios.create({
 //! ─── REQUEST INTERCEPTOR ───────────────────────────────────────────
 //* Attach the access token to every outgoing request
 api.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem("access_token"); //? consistent key
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+  // const token = sessionStorage.getItem("access_token"); //? consistent key
+  // if (token) {
+  //   config.headers.Authorization = `Bearer ${token}`;
+  // }
+  // return config;
+  return chrome.storage.session.get("access_token").then(({ access_token }) => {
+    if (access_token) {
+      config.headers.Authorization = `Bearer ${access_token}`;
+    }
+    return config;
+  });
 });
 
 //! ─── RESPONSE INTERCEPTOR ──────────────────────────────────────────
@@ -67,8 +73,9 @@ api.interceptors.response.use(
     } catch (refreshError) {
       processQueue(refreshError, null);
       //? Refresh token is dead → force logout
-      sessionStorage.removeItem("access_token");
-      sessionStorage.removeItem("user");
+      // sessionStorage.removeItem("access_token");
+      // sessionStorage.removeItem("user");
+      await chrome.storage.session.remove(["access_token", "user"]);
       //? Dispatch a custom event so Popup can react
       window.dispatchEvent(new Event("auth:logout"));
       return Promise.reject(refreshError);
