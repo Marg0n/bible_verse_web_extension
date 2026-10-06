@@ -12,7 +12,8 @@ export async function refreshAccessToken(): Promise<string | null> {
 
     const jsonData = await res.json();
     const newToken = jsonData.data.access_token;
-    sessionStorage.setItem("access_token", newToken);
+    // sessionStorage.setItem("access_token", newToken);
+    await chrome.storage.session.set({ access_token: newToken });
     return newToken;
   } catch {
     return null;

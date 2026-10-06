@@ -32,12 +32,18 @@ export const useLogin = (onLoginSuccess: () => void) => {
 
         const { user, access_token } = data.data;
 
-        sessionStorage.setItem("access_token", access_token);
-        sessionStorage.setItem("user", JSON.stringify(user));
+        //? chrome.storage.session survives popup close/reopen + SW eviction
+        await chrome.storage.session.set({
+          access_token,
+          user,
+        });
+
+        // sessionStorage.setItem("access_token", access_token);
+        // sessionStorage.setItem("user", JSON.stringify(user));
         //? Refresh token Already in the httpOnly cookie. Nothing to do.
 
         // console.log(data);
-        
+
         onLoginSuccess();
       } catch (err) {
         setError(err instanceof Error ? err.message : "Login failed");
