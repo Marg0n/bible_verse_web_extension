@@ -117,17 +117,28 @@ export default function Popup() {
 
   if (loading)
     return (
-      <Card className="animate-pulse p-6">
+      <PopupLayout title="Bible Verse" className="animate-pulse p-6">
         <div className="space-y-4">
           <div className="h-4 bg-zinc-800 rounded w-1/3 mb-6"></div>
           <div className="h-5 bg-zinc-800 rounded w-full"></div>
           <div className="h-5 bg-zinc-800 rounded w-5/6"></div>
           <div className="h-4 bg-zinc-800 rounded w-3/4 pt-4 border-t border-zinc-800/20"></div>
         </div>
-      </Card>
+      </PopupLayout>
     );
 
-  if (error) return <div className="p-4 text-red-400">Error: {error}</div>;
+  if (error) {
+    return (
+      <PopupLayout 
+      title="Bible Verse" 
+      className="animate-pulse p-6 flex flex-col justify-center items-center"
+      >
+          <div className=" bg-zinc-800 rounded w-full p-4 text-red-400">
+            Error: {error}
+          </div>
+      </PopupLayout>
+    );
+  }
 
   //* ==========================================
   //* CONDITIONAL RENDERING BASED ON authView
@@ -173,7 +184,7 @@ export default function Popup() {
     );
   }
 
-  if (booting) return <Card className="animate-pulse p-6">…</Card>;
+  if (booting) return <Card className="animate-pulse p-6">Booting...</Card>;
 
   //* ==========================================
   //* NORMAL HOME VIEW (Accessible to Everyone)
