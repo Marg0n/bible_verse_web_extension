@@ -217,7 +217,7 @@ export default function Popup() {
               onClick={() => setAuthView("login")}
               className="text-xs text-blue-400 hover:bg-gradient-to-t hover:from-green-100 hover:to-violet-200 hover:text-zinc-900 hover:font-semibold transition-all duration-300 cursor-pointer"
             >
-              Login ?
+              Login
             </Button>
           )}
         </div>
