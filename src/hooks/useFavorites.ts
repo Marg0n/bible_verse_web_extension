@@ -8,33 +8,45 @@ export function useFavorites() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  //* Fetch favorites from the backend on mount
-  useEffect(() => {
-    // const token = sessionStorage.getItem("access_token");
-    // if (!token) return; //? no point fetching without auth
-    chrome.storage.session.get("access_token").then(({ access_token }) => {
-      if (!access_token) return;
+  //? Wrapped in useCallback so it can be safely reused across effects and triggers
+  const fetchFavorites = useCallback(async () => {
+    try {
+      setLoading(true);
+      const { access_token } = await chrome.storage.session.get("access_token");
+      
+      //? If no token, clear favorites and ensure loading stops immediately
+      if (!access_token) {
+        setFavorites([]);
+        setLoading(false);
+        return;
+      }
 
-      const fetchFavorites = async () => {
-        try {
-          setLoading(true);
-          //? api() auto-attaches the Bearer token + handles 401 refresh
-          const response = await api("/favorites");
-          // console.log("RAW:", JSON.stringify(response));
-          setFavorites(response?.data?.data || []);
-          setError(null);
-        } catch (err: any) {
-          setError(err.message || "Something went wrong");
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchFavorites();
-    });
+      //? api() auto-attaches the Bearer token + handles 401 refresh
+      const response = await api("/favorites");
+      setFavorites(response?.data?.data || []);
+      setError(null);
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  //* Listen for forced logout (refresh token expired)
+  //? Fetch favorites from the backend on mount
+  useEffect(() => {
+    fetchFavorites();
+  }, [fetchFavorites]);
+
+  //? Listen for login event to automatically fetch favorites (matches your auth:logout pattern)
+  useEffect(() => {
+    const handleLogin = () => {
+      fetchFavorites();
+    };
+    window.addEventListener("auth:login", handleLogin);
+    return () => window.removeEventListener("auth:login", handleLogin);
+  }, [fetchFavorites]);
+
+  //? Listen for forced logout (refresh token expired)
   useEffect(() => {
     const handleLogout = () => {
       setFavorites([]);
@@ -76,5 +88,5 @@ export function useFavorites() {
     return favorites.some((item) => item.verseId === convertVerseId);
   };
 
-  return { favorites, loading, error, addFavorite, removeFavorite, isFavorite };
+  return { favorites, loading, error, addFavorite, removeFavorite, isFavorite, refetchFavorites: fetchFavorites };
 }
