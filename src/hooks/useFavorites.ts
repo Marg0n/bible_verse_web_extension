@@ -8,7 +8,7 @@ export function useFavorites() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  //? Wrapped in useCallback so it can be safely reused across effects and triggers
+  //* Wrapped in useCallback so it can be safely reused across effects and triggers
   const fetchFavorites = useCallback(async () => {
     try {
       setLoading(true);
@@ -32,12 +32,12 @@ export function useFavorites() {
     }
   }, []);
 
-  //? Fetch favorites from the backend on mount
+  //* Fetch favorites from the backend on mount
   useEffect(() => {
     fetchFavorites();
   }, [fetchFavorites]);
 
-  //? Listen for login event to automatically fetch favorites (matches your auth:logout pattern)
+  //* Listen for login event to automatically fetch favorites (matches auth:logout pattern)
   useEffect(() => {
     const handleLogin = () => {
       fetchFavorites();
@@ -46,7 +46,7 @@ export function useFavorites() {
     return () => window.removeEventListener("auth:login", handleLogin);
   }, [fetchFavorites]);
 
-  //? Listen for forced logout (refresh token expired)
+  //* Listen for forced logout (refresh token expired)
   useEffect(() => {
     const handleLogout = () => {
       setFavorites([]);
