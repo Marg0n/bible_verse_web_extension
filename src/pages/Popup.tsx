@@ -129,13 +129,13 @@ export default function Popup() {
 
   if (error) {
     return (
-      <PopupLayout 
-      title="Bible Verse" 
-      className="animate-pulse p-6 flex flex-col justify-center items-center"
+      <PopupLayout
+        title="Bible Verse"
+        className="animate-pulse p-6 flex flex-col justify-center items-center"
       >
-          <div className=" bg-zinc-800 rounded w-full p-4 text-red-400">
-            Error: {error}
-          </div>
+        <div className=" bg-zinc-800 rounded w-full p-4 text-red-400">
+          Error: {error}
+        </div>
       </PopupLayout>
     );
   }
@@ -155,6 +155,7 @@ export default function Popup() {
             onLoginSuccess={() => {
               setIsLoggedIn(true);
               setAuthView("home"); //? Return to home after login
+              window.dispatchEvent(new Event("auth:login")); //? This triggers new listener in useFavorites instantly!
             }}
             switchToRegister={() => setAuthView("register")}
             switchToHome={() => setAuthView("home")}
