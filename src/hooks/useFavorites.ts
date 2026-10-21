@@ -57,10 +57,11 @@ export function useFavorites() {
   }, []);
 
   //* Add favorite
-  const addFavorite = useCallback(async (verseId: number) => {
+  const addFavorite = useCallback(async (verseId: string) => {
     try {
       const response = await api.post("/favorites", {
-        verseId: String(verseId),
+        // verseId: String(verseId),
+        verseId: verseId,
       }); //? axios auto-stringifies
       if (response?.data?.data) {
         setFavorites((prev) => [...prev, response.data.data]);
@@ -81,11 +82,12 @@ export function useFavorites() {
   }, []);
 
   //* Check if a verse is favorited
-  const isFavorite = (verseId: number) => {
+  const isFavorite = (verseId: string) => {
     //? convert to int for check
-    const convertVerseId = verseId.toString();
+    // const convertVerseId = verseId.toString();
+    // const convertVerseId = parseInt(verseId);
 
-    return favorites.some((item) => item.verseId === convertVerseId);
+    return favorites.some((item) => item.verseId === verseId);
   };
 
   return { favorites, loading, error, addFavorite, removeFavorite, isFavorite, refetchFavorites: fetchFavorites };

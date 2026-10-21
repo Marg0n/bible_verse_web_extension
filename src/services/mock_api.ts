@@ -11,7 +11,7 @@ const MOCK_VERSES = [
     text_en:
       "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future.",
     verse: 11,
-    verseId: 24029011,
+    verseId: '24029011',
   },
   {
     book_bn: "যোহন",
@@ -23,7 +23,7 @@ const MOCK_VERSES = [
     text_en:
       "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.",
     verse: 16,
-    verseId: 43003016,
+    verseId: '43003016',
   },
   {
     book_bn: "ফিলিপ্পীয়",
@@ -33,7 +33,7 @@ const MOCK_VERSES = [
     text_bn: "যিনি আমাকে শক্তি দেন তাঁর মাধ্যমে আমি সব কিছু করতে পারি।",
     text_en: "I can do all this through him who gives me strength.",
     verse: 13,
-    verseId: 50004013,
+    verseId: '50004013',
   },
   {
     book_bn: "সামসংগীত",
@@ -43,7 +43,7 @@ const MOCK_VERSES = [
     text_bn: "সদাপ্রভু আমার মেষপালক, আমার কোনো অভাব নেই।",
     text_en: "The Lord is my shepherd, I lack nothing.",
     verse: 1,
-    verseId: 19023001,
+    verseId: '19023001',
   },
   {
     book_bn: "ইসাইয়া",
@@ -55,7 +55,7 @@ const MOCK_VERSES = [
     text_en:
       "But those who hope in the Lord will renew their strength. They will soar on wings like eagles.",
     verse: 31,
-    verseId: 23040031,
+    verseId: '23040031',
   },
   {
     book_bn: "২ যোহন",
@@ -67,7 +67,7 @@ const MOCK_VERSES = [
     text_en:
       "If there come any unto you, and bring not this doctrine, receive him not into your house, neither bid him God speed:",
     verse: 10,
-    verseId: 62000009,
+    verseId: '62000009',
   },
 ];
 

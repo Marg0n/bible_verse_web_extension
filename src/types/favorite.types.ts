@@ -1,9 +1,9 @@
 import type { VerseData } from "./bible.types";
 
 export interface FavoriteButtonProps {
-  verseId: number;
-  isFavorite: (id: number) => boolean;
-  addFavorite: (id: number) => void;
+  verseId: string;
+  isFavorite: (id: string) => boolean;
+  addFavorite: (id: string) => void;
   removeFavorite: (id: string) => void;
 }
 
