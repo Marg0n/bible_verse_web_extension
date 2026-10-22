@@ -8,6 +8,8 @@ export default function FavoriteButton({
   removeFavorite,
 }: FavoriteButtonProps) {
   // const { addFavorite, removeFavorite, isFavorite } = useFavorites();
+  // if (typeof verseId === "number") {
+  // }
   const active = isFavorite(verseId);
 
   //? convert veerseId to string
@@ -20,7 +22,11 @@ export default function FavoriteButton({
       className={`h-10 w-10 p-0 rounded-full transition-all duration-200 active:scale-125 ${
         active ? "text-yellow-500" : "text-white hover:text-zinc-200"
       } cursor-pointer`}
-      onClick={() => (active ? removeFavorite(convertedVerseId) : addFavorite(verseId))} //? toggle
+      onClick={() =>
+        active
+          ? removeFavorite(convertedVerseId)
+          : addFavorite(convertedVerseId)
+      } //? toggle
       title={active ? "Remove from Favorites" : "Save to Favorites"}
     >
       <svg

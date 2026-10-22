@@ -229,7 +229,7 @@ export default function Popup() {
           {/* Favorites buttons */}
           {isLoggedIn && (
             <FavoriteButton
-              verseId={verse?.verseId as number}
+              verseId={verse?.verseId as string}
               isFavorite={isFavorite}
               addFavorite={addFavorite}
               removeFavorite={removeFavorite}
