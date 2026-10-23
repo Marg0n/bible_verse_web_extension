@@ -27,7 +27,8 @@ export default function VerseCard({ verse, loading }: Props) {
       <div className="space-y-5">
         {/* English Section */}
         <p className="text-lg font-medium leading-relaxed text-zinc-100 group-hover/card:text-white transition-colors duration-300">
-          {verse.text_en}
+          {verse.text_en} 
+          {/* {verse.verseId} */}
         </p>
         {/* Footer: En Reference */}
         <div className="flex justify-end -mt-1">
