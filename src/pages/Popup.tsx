@@ -375,6 +375,7 @@ export default function Popup() {
                 className="flex items-center justify-between w-full text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1 hover:text-zinc-300 transition-colors"
               >
                 <span>Saved Verses ({favorites.length})</span>
+                {/* Dropdown Arrow */}
                 <span
                   className={`transition-transform duration-300 ${isFavoritesOpen ? "rotate-180" : "rotate-0"}`}
                 >

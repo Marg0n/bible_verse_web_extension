@@ -27,8 +27,8 @@ export default function PopupLayout({
         >
           {children}
         </main>
-        {footer && <Footer>{footer}</Footer>}
       </Container>
+      {footer && <Footer>{footer}</Footer>}
     </>
   );
 }
