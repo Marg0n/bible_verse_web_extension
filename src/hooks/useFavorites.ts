@@ -13,7 +13,7 @@ export function useFavorites() {
     try {
       setLoading(true);
       const { access_token } = await chrome.storage.session.get("access_token");
-      
+
       //? If no token, clear favorites and ensure loading stops immediately
       if (!access_token) {
         setFavorites([]);
@@ -23,7 +23,17 @@ export function useFavorites() {
 
       //? api() auto-attaches the Bearer token + handles 401 refresh
       const response = await api("/favorites");
-      setFavorites(response?.data?.data || []);
+
+      //? Ensure verseId is always a string for safe comparisons
+      const normalizedFavorites = (response?.data?.data || []).map(
+        (item: any) => ({
+          ...item,
+          verseId: String(item.verseId),
+        }),
+      );
+
+      // setFavorites(response?.data?.data || []);
+      setFavorites(normalizedFavorites);
       setError(null);
     } catch (err: any) {
       setError(err.message || "Something went wrong");
@@ -56,25 +66,39 @@ export function useFavorites() {
     return () => window.removeEventListener("auth:logout", handleLogout);
   }, []);
 
-  //* Add favorite
-  const addFavorite = useCallback(async (verseId: string) => {
+  //* Add favorite with error boundary protection
+  const addFavorite = useCallback(async (verseId: string | number) => {
     try {
+      const stringId = String(verseId);
+
       const response = await api.post("/favorites", {
         // verseId: String(verseId),
-        verseId: verseId,
+        verseId: stringId,
       }); //? axios auto-stringifies
+
       if (response?.data?.data) {
-        setFavorites((prev) => [...prev, response.data.data]);
+        // setFavorites((prev) => [...prev, response.data.data]);
+        
+        const newItem = {
+          ...response.data.data,
+          verseId: String(response.data.data.verseId),
+        };
+
+        setFavorites((prev) => [...prev, newItem]);
       }
     } catch (err: any) {
       console.error("Add favorite error:", err.message);
     }
   }, []);
 
-  //* Remove favorite
-  const removeFavorite = useCallback(async (verseId: string) => {
+  //* Remove favorite with strict string matching
+  const removeFavorite = useCallback(async (verseId: string | number) => {
     try {
-      await api(`/favorites/${verseId}`, { method: "DELETE" });
+      const stringId = String(verseId);
+
+      // await api(`/favorites/${verseId}`, { method: "DELETE" });
+      await api(`/favorites/${stringId}`, { method: "DELETE" });
+
       setFavorites((prev) => prev.filter((item) => item.verseId !== verseId)); //? "18110009" !=  18110009 false (loose equality coerces types, they "match")
     } catch (err: any) {
       console.error("Remove favorite error:", err.message);
@@ -82,13 +106,25 @@ export function useFavorites() {
   }, []);
 
   //* Check if a verse is favorited
-  const isFavorite = (verseId: string) => {
+  const isFavorite = (verseId: string| number) => {
     //? convert to int for check
     // const convertVerseId = verseId.toString();
     // const convertVerseId = parseInt(verseId);
 
-    return favorites.some((item) => item.verseId === verseId);
+    // return favorites.some((item) => item.verseId === verseId);
+
+    const stringId = String(verseId);
+    
+    return favorites.some((item) => String(item.verseId) === stringId);
   };
 
-  return { favorites, loading, error, addFavorite, removeFavorite, isFavorite, refetchFavorites: fetchFavorites };
+  return {
+    favorites,
+    loading,
+    error,
+    addFavorite,
+    removeFavorite,
+    isFavorite,
+    refetchFavorites: fetchFavorites,
+  };
 }
