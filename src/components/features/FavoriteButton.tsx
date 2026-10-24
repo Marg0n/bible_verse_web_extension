@@ -12,8 +12,21 @@ export default function FavoriteButton({
   // }
   const active = isFavorite(verseId);
 
-  //? convert veerseId to string
-  const convertedVerseId = verseId.toString();
+  //? convert verseId to string
+  const convertedVerseId = String(verseId);
+
+  //* Handle the clicking events
+  const handleClick = async () => {
+    try {
+      if (active) {
+        await removeFavorite(convertedVerseId);
+      } else {
+        await addFavorite(convertedVerseId);
+      }
+    } catch (err) {
+      console.error("Failed to toggle favorite:", err);
+    }
+  };
 
   return (
     <Button
@@ -22,11 +35,7 @@ export default function FavoriteButton({
       className={`h-10 w-10 p-0 rounded-full transition-all duration-200 active:scale-125 ${
         active ? "text-yellow-500" : "text-white hover:text-zinc-200"
       } cursor-pointer`}
-      onClick={() =>
-        active
-          ? removeFavorite(convertedVerseId)
-          : addFavorite(convertedVerseId)
-      } //? toggle
+      onClick={handleClick} //? toggle
       title={active ? "Remove from Favorites" : "Save to Favorites"}
     >
       <svg
