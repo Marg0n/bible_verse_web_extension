@@ -6,7 +6,6 @@ export interface LoginResponse {
       id: string;
       createdAt: string;
       email: string;
-      refreshToken: string | null;
       theme: string;
       streakCount: number;
       lastActiveDate: string | null;
