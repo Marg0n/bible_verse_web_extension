@@ -45,7 +45,7 @@ export function useDailyVerse() {
         localStorage.setItem("daily_verse_data", JSON.stringify(verseData));
         localStorage.setItem("daily_verse_tz", tz);
       } catch (err: any) {
-        setError(err.message || "Something went wrong");
+        setError(err instanceof Error ? err.message : "Something went wrong");
       } finally {
         setLoading(false);
       }

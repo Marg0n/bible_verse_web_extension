@@ -86,13 +86,16 @@ export default function Popup() {
 
   //* Refetching Daily verse handler
   const handleRefetchNewVerse = async () => {
-    //? Removing localhost data
-    // sessionStorage.removeItem("daily_verse_date");
-    // sessionStorage.removeItem("daily_verse_data");
+    //? Removing local data
     await chrome.storage.session.remove([
       "daily_verse_date",
       "daily_verse_data",
     ]);
+
+    //? Removing Local storage data
+    localStorage.removeItem("daily_verse_date");
+    localStorage.removeItem("daily_verse_data");
+    localStorage.removeItem("daily_verse_tz");
 
     setSearchLoading(true);
 
