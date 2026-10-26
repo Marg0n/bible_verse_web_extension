@@ -8,6 +8,8 @@ export const useLogin = (onLoginSuccess: () => void) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  //* user state
+  const [user, setUser] = useState<LoginResponse["data"]["user"] | null>(null);
 
   //* Handle Login
   const handleLogin = useCallback(
@@ -31,6 +33,9 @@ export const useLogin = (onLoginSuccess: () => void) => {
         }
 
         const { user, access_token } = data.data;
+        
+        //? Save user to hook state
+        setUser(user);
 
         //? chrome.storage.session survives popup close/reopen + SW eviction
         await chrome.storage.session.set({
@@ -65,6 +70,7 @@ export const useLogin = (onLoginSuccess: () => void) => {
     password,
     error,
     loading,
+    user,
     handleLogin,
     reset,
     setEmail,

@@ -1,8 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { BsCalendar2Month } from "react-icons/bs";
+import { FaRandom } from "react-icons/fa";
 import { GiCrossMark } from "react-icons/gi";
+import { RiLogoutCircleLine } from "react-icons/ri";
 import { Login } from "../components/auth/Login";
 import Registration from "../components/auth/Registration";
+import FavoriteButton from "../components/features/FavoriteButton";
 import FavoritesSection from "../components/features/FavoritesSection";
 import ShareMenu from "../components/features/ShareMenu";
 import StreakBadge from "../components/features/StreakBadge";
@@ -16,10 +19,8 @@ import { useFavorites } from "../hooks/useFavorites";
 import useRandomVerse from "../hooks/useRandomVerse";
 import { useVerseSearch } from "../hooks/useVerseSearch";
 import type { VerseData } from "../types/bible.types";
-import { FaRandom } from "react-icons/fa";
+import type { UserData } from "../types/UserData.types";
 import { logout } from "../utils/logout";
-import { RiLogoutCircleLine } from "react-icons/ri";
-import FavoriteButton from "../components/features/FavoriteButton";
 
 //* Define the views will be showing
 type AuthView = "home" | "login" | "register";
@@ -27,17 +28,22 @@ type AuthView = "home" | "login" | "register";
 export default function Popup() {
   //* Start on "home" (public view) or check if they have a saved token
   const [authView, setAuthView] = useState<AuthView>("home");
+
   //* Check initial login status from storage on load
-  // const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-  //   const token = sessionStorage.getItem("access_token");
-  //   return !!token; //? Returns true if token exists, false if null
-  // });
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [booting, setBooting] = useState(true);
+  const [user, setUser] = useState<UserData | null>(null); //? user state
 
+  //? Updating boot useEffect to fetch both token AND user
   useEffect(() => {
-    chrome.storage.session.get("access_token").then(({ access_token }) => {
-      if (access_token) setIsLoggedIn(true);
+    chrome.storage.session.get(["access_token", "user"]).then((result) => {
+      const data = result as {
+        access_token?: string;
+        user?: UserData;
+      };
+
+      if (data.access_token) setIsLoggedIn(true);
+      if (data.user) setUser(data.user);
       setBooting(false);
     });
   }, []);
@@ -80,13 +86,16 @@ export default function Popup() {
 
   //* Refetching Daily verse handler
   const handleRefetchNewVerse = async () => {
-    //? Removing localhost data
-    // sessionStorage.removeItem("daily_verse_date");
-    // sessionStorage.removeItem("daily_verse_data");
+    //? Removing local data
     await chrome.storage.session.remove([
       "daily_verse_date",
       "daily_verse_data",
     ]);
+
+    //? Removing Local storage data
+    localStorage.removeItem("daily_verse_date");
+    localStorage.removeItem("daily_verse_data");
+    localStorage.removeItem("daily_verse_tz");
 
     setSearchLoading(true);
 
@@ -152,8 +161,12 @@ export default function Popup() {
       >
         <div className="p-2 flex justify-center">
           <Login
-            onLoginSuccess={() => {
+            onLoginSuccess={async () => {
               setIsLoggedIn(true);
+              //? Optionally grabing user directly from storage right after login
+              const sessionData = await chrome.storage.session.get("user");
+              if (sessionData.user) setUser(sessionData.user as UserData);
+
               setAuthView("home"); //? Return to home after login
               window.dispatchEvent(new Event("auth:login")); //? This triggers new listener in useFavorites instantly!
             }}
@@ -209,7 +222,7 @@ export default function Popup() {
                 }}
                 title="Logout"
               />
-              <StreakBadge />
+              <StreakBadge user={user} />
             </>
           ) : (
             <Button
