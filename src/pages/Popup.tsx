@@ -21,6 +21,7 @@ import { useVerseSearch } from "../hooks/useVerseSearch";
 import type { VerseData } from "../types/bible.types";
 import type { UserData } from "../types/UserData.types";
 import { logout } from "../utils/logout";
+import { useUpdateStreak } from "../hooks/useStreak";
 
 //* Define the views will be showing
 type AuthView = "home" | "login" | "register";
@@ -34,7 +35,17 @@ export default function Popup() {
   const [booting, setBooting] = useState(true);
   const [user, setUser] = useState<UserData | null>(null); //? user state
 
-  //? Updating boot useEffect to fetch both token AND user
+  //* Update Streak on login
+  useUpdateStreak(isLoggedIn, (newStreak) => {
+    //? Updates local user state so the StreakBadge updates instantly
+    if (user) {
+      const updatedUser = { ...user, streakCount: newStreak };
+      setUser(updatedUser);
+      chrome.storage.session.set({ user: updatedUser });
+    }
+  });
+
+  //* Updating boot useEffect to fetch both token AND user
   useEffect(() => {
     chrome.storage.session.get(["access_token", "user"]).then((result) => {
       const data = result as {
