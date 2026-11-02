@@ -173,11 +173,18 @@ export default function Popup() {
         <div className="p-2 flex justify-center">
           <Login
             onLoginSuccess={async () => {
+              //? Immediately mark as logged in so hooks know to run
               setIsLoggedIn(true);
-              //? Optionally grabing user directly from storage right after login
-              const sessionData = await chrome.storage.session.get("user");
+
+              //? Immediately fetch both token & user from storage where they were just saved
+              const sessionData = await chrome.storage.session.get([
+                "access_token",
+                "user",
+              ]);
+
               if (sessionData.user) setUser(sessionData.user as UserData);
 
+              //? Return home and notify other listeners
               setAuthView("home"); //? Return to home after login
               window.dispatchEvent(new Event("auth:login")); //? This triggers new listener in useFavorites instantly!
             }}
